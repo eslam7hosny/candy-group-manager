@@ -63,7 +63,7 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <label class="field">اسم المنتج<input id="productName" required placeholder="اسم الصنف"></label>
 <label class="field">سعر البيع (ج.م)<input id="productPrice" type="number" min="0" step=".01" required></label>
 <label class="field">الكمية<input id="productQty" type="number" min="0" step="1" value="0" required></label>
-<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في Supabase</button><button class="secondary" type="button" onclick="hideForm('productForm')">إلغاء</button></div>
+<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ المنتج تجريبيًا</button><button class="secondary" type="button" onclick="hideForm('productForm')">إلغاء</button></div>
 </form>
 <div class="card table-wrap"><table><thead><tr><th>المنتج</th><th>سعر البيع</th><th>الكمية</th></tr></thead><tbody id="productRows"><tr><td colspan="3" class="empty">لا توجد منتجات مضافة بعد.</td></tr></tbody></table></div>
 </section>
@@ -73,7 +73,7 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <label class="field">العميل<select id="invoiceCustomer" required><option value="">اختر العميل</option></select></label>
 <label class="field">قيمة الفاتورة (ج.م)<input id="invoiceAmount" type="number" min=".01" step=".01" required></label>
 <label class="field">المبلغ المدفوع (ج.م)<input id="invoicePaid" type="number" min="0" step=".01" value="0" required></label>
-<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في Supabase</button><button class="secondary" type="button" onclick="hideForm('invoiceForm')">إلغاء</button></div>
+<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ الفاتورة تجريبيًا</button><button class="secondary" type="button" onclick="hideForm('invoiceForm')">إلغاء</button></div>
 </form>
 <div class="card table-wrap"><table><thead><tr><th>العميل</th><th>قيمة الفاتورة</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody id="invoiceRows"><tr><td colspan="4" class="empty">لا توجد فواتير تجريبية بعد.</td></tr></tbody></table></div>
 <div class="notice">تنبيه: البيانات في هذه النسخة تجريبية ومحفوظة داخل الصفحة فقط. لا تستخدمها كسجل محاسبي حقيقي؛ سنربطها بقاعدة Supabase بعد إعداد الاتصال والصلاحيات.</div>
@@ -108,7 +108,7 @@ const SUPABASE_URL='https://squdnpexfpinyfwdgepf.supabase.co';
 const SUPABASE_KEY='sb_publishable_g19atI_EDc7xIOlEbm8HRg_B3nd85Gx';
 const CUSTOMER_TABLE='store_customers';
 let customerTable={name:CUSTOMER_TABLE,mapping:{nameCol:'name',phoneCol:'phone',addressCol:'address'}}, apiReady=false;
-const apiHeaders={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'};
+const apiHeaders={'apikey':SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json','Accept-Profile':'public','Content-Profile':'public'};
 function setConnection(ok,msg){document.getElementById('connectionBadge').textContent=ok?'تم الاتصال':'تعذر الاتصال';document.getElementById('connectionBadge').style.color=ok?'#176b42':'#a33';document.getElementById('connectionMessage').textContent=msg;}
 async function discoverSupabase(){
   apiReady=false;
