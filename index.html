@@ -85,6 +85,7 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <div class="notice"><strong>مهم:</strong> حفظ العملاء سيُجرّب عبر Supabase بعد اكتشاف الجدول والصلاحيات. المنتجات والفواتير والتقارير ما زالت تجريبية في هذه النسخة؛ لا تعتمد عليها كسجل محاسبي كامل بعد.</div>
 </main>
 <footer>© Candy Group Manager · واجهة أولية قابلة للتطوير</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const customers=[],products=[],invoices=[];
 const money=n=>Number(n||0).toLocaleString('ar-EG',{maximumFractionDigits:2})+' ج.م';
@@ -106,6 +107,7 @@ document.getElementById('invoiceCustomer').innerHTML='<option value="">اختر 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const SUPABASE_URL='https://squdnpexfpinyfwdgepf.supabase.co';
 const SUPABASE_KEY='sb_publishable_g19atI_EDc7xIOlEbm8HRg_B3nd85Gx';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const CUSTOMER_TABLE='store_customers';
 let customerTable={name:CUSTOMER_TABLE,mapping:{nameCol:'name',phoneCol:'phone',addressCol:'address'}}, apiReady=false;
 const apiHeaders={'apikey':SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json','Accept-Profile':'public','Content-Profile':'public'};
@@ -167,8 +169,8 @@ document.getElementById('customerForm').addEventListener('submit',async e=>{
  if(!m.nameCol){alert('لم يتم تحديد عمود اسم العميل؛ لم يتم الحفظ.');return;}
  const payload={[m.nameCol]:name};if(m.phoneCol&&phone)payload[m.phoneCol]=phone;if(m.addressCol&&address)payload[m.addressCol]=address;
  try{
-  const res=await fetch(SUPABASE_URL+'/rest/v1/'+CUSTOMER_TABLE,{method:'POST',headers:{...apiHeaders,'Prefer':'return=minimal'},body:JSON.stringify(payload)});
-  if(!res.ok){const body=await res.text();throw new Error('رفضت قاعدة البيانات الحفظ ('+res.status+'): '+body.slice(0,260));}
+  const { error } = await supabaseClient.from(CUSTOMER_TABLE).insert(payload);
+  if(error){throw new Error('رفضت قاعدة البيانات الحفظ ('+(error.code||'Supabase')+'): '+error.message+(error.details?' — '+error.details:''));}
   e.target.reset();hideForm('customerForm');await loadCustomers();alert('تم قبول طلب الحفظ من Supabase. تأكد من ظهور العميل في القائمة.');
  }catch(err){alert('لم يتم حفظ العميل. '+err.message+'\nلم تُحفظ البيانات في الواجهة فقط. لا تستخدم مفتاحًا سريًا في المتصفح.');}
 });
