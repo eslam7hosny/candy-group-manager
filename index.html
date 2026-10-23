@@ -30,9 +30,9 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <main class="wrap">
 <section class="card" style="margin-bottom:16px">
   <div class="row"><strong>اتصال قاعدة البيانات</strong><span id="connectionBadge" style="font-size:12px;color:#705316">جارٍ فحص الاتصال…</span></div>
-  <p id="connectionMessage" style="font-size:13px;line-height:1.7;color:var(--muted);margin:10px 0">يحاول التطبيق الاتصال بمشروع Supabase واكتشاف الجداول المتاحة. لا تدخل بيانات حقيقية قبل نجاح اختبار الحفظ.</p>
+  <p id="connectionMessage" style="font-size:13px;line-height:1.7;color:var(--muted);margin:10px 0">يختبر التطبيق الوصول المباشر لجدول العملاء فقط. لا تدخل بيانات حقيقية قبل نجاح اختبار الحفظ.</p>
   <button class="secondary" type="button" id="testConnectionBtn">اختبار الاتصال مرة أخرى</button>
-  <details style="margin-top:10px"><summary>تفاصيل الجداول المكتشفة</summary><div id="schemaDetails" style="font-size:12px;line-height:1.8;overflow-wrap:anywhere;margin-top:8px">لم يتم الفحص بعد.</div></details>
+  <details style="margin-top:10px"><summary>تفاصيل اختبار جدول العملاء</summary><div id="schemaDetails" style="font-size:12px;line-height:1.8;overflow-wrap:anywhere;margin-top:8px">لم يتم الفحص بعد.</div></details>
 </section>
 <h2 class="section-title">ملخص النشاط</h2>
 <div class="stats">
@@ -53,7 +53,7 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <label class="field">اسم العميل<input id="customerName" required placeholder="اسم المحل أو العميل"></label>
 <label class="field">رقم الهاتف<input id="customerPhone" inputmode="tel" placeholder="اختياري"></label>
 <label class="field">العنوان<input id="customerAddress" placeholder="العنوان"></label>
-<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في قاعدة البيانات</button><button class="secondary" type="button" onclick="hideForm('customerForm')">إلغاء</button></div>
+<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في Supabase</button><button class="secondary" type="button" onclick="hideForm('customerForm')">إلغاء</button></div>
 </form>
 <div class="card table-wrap"><table><thead><tr><th>اسم العميل</th><th>الهاتف</th><th>العنوان</th></tr></thead><tbody id="customerRows"><tr><td colspan="3" class="empty">لا يوجد عملاء مضافون بعد.</td></tr></tbody></table></div>
 </section>
@@ -63,7 +63,7 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <label class="field">اسم المنتج<input id="productName" required placeholder="اسم الصنف"></label>
 <label class="field">سعر البيع (ج.م)<input id="productPrice" type="number" min="0" step=".01" required></label>
 <label class="field">الكمية<input id="productQty" type="number" min="0" step="1" value="0" required></label>
-<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في قاعدة البيانات</button><button class="secondary" type="button" onclick="hideForm('productForm')">إلغاء</button></div>
+<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في Supabase</button><button class="secondary" type="button" onclick="hideForm('productForm')">إلغاء</button></div>
 </form>
 <div class="card table-wrap"><table><thead><tr><th>المنتج</th><th>سعر البيع</th><th>الكمية</th></tr></thead><tbody id="productRows"><tr><td colspan="3" class="empty">لا توجد منتجات مضافة بعد.</td></tr></tbody></table></div>
 </section>
@@ -73,7 +73,7 @@ button,input,select{font:inherit}button{cursor:pointer}.primary{border:0;border-
 <label class="field">العميل<select id="invoiceCustomer" required><option value="">اختر العميل</option></select></label>
 <label class="field">قيمة الفاتورة (ج.م)<input id="invoiceAmount" type="number" min=".01" step=".01" required></label>
 <label class="field">المبلغ المدفوع (ج.م)<input id="invoicePaid" type="number" min="0" step=".01" value="0" required></label>
-<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في قاعدة البيانات</button><button class="secondary" type="button" onclick="hideForm('invoiceForm')">إلغاء</button></div>
+<div class="row" style="grid-column:1/-1"><button class="primary" type="submit">حفظ العميل في Supabase</button><button class="secondary" type="button" onclick="hideForm('invoiceForm')">إلغاء</button></div>
 </form>
 <div class="card table-wrap"><table><thead><tr><th>العميل</th><th>قيمة الفاتورة</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody id="invoiceRows"><tr><td colspan="4" class="empty">لا توجد فواتير تجريبية بعد.</td></tr></tbody></table></div>
 <div class="notice">تنبيه: البيانات في هذه النسخة تجريبية ومحفوظة داخل الصفحة فقط. لا تستخدمها كسجل محاسبي حقيقي؛ سنربطها بقاعدة Supabase بعد إعداد الاتصال والصلاحيات.</div>
@@ -106,72 +106,71 @@ document.getElementById('invoiceCustomer').innerHTML='<option value="">اختر 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const SUPABASE_URL='https://squdnpexfpinyfwdgepf.supabase.co';
 const SUPABASE_KEY='sb_publishable_g19atI_EDc7xIOlEbm8HRg_B3nd85Gx';
-let apiTables=[], customerTable=null, customerColumns=[], apiReady=false;
+const CUSTOMER_TABLE='store_customers';
+let customerTable={name:CUSTOMER_TABLE,mapping:{nameCol:'name',phoneCol:'phone',addressCol:'address'}}, apiReady=false;
 const apiHeaders={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'};
 function setConnection(ok,msg){document.getElementById('connectionBadge').textContent=ok?'تم الاتصال':'تعذر الاتصال';document.getElementById('connectionBadge').style.color=ok?'#176b42':'#a33';document.getElementById('connectionMessage').textContent=msg;}
-function scoreCustomerTable(name){const n=name.toLowerCase();let score=0;if(/customer|client|customers/.test(n))score+=10;if(/store_customers/.test(n))score+=8;if(/group|member/.test(n))score-=5;if(/order|item|image/.test(n))score-=8;return score;}
-function getSchemaColumns(pathItem){const op=pathItem?.post||pathItem?.get;const ref=op?.parameters?.find(p=>p.in==='body')?.schema?.$ref; if(ref){const key=ref.split('/').pop();return apiSpec?.definitions?.[key]?.properties||{};} return {};}
-let apiSpec=null;
 async function discoverSupabase(){
-  apiReady=false; customerTable=null; customerColumns=[];
-  setConnection(false,'جارٍ الاتصال بمشروع Supabase واكتشاف الجداول…');
+  apiReady=false;
+  setConnection(false,'جارٍ اختبار الوصول المباشر إلى جدول العملاء store_customers…');
+  document.getElementById('schemaDetails').textContent='يتم اختبار جدول store_customers مباشرة؛ لا يتم استخدام نقطة اكتشاف المخطط التي تتطلب مفتاحًا سريًا.';
   try{
-    const response=await fetch(SUPABASE_URL+'/rest/v1/',{method:'GET',headers:{...apiHeaders,'Accept':'application/openapi+json'}});
-    if(!response.ok){const body=await response.text();throw new Error('استجابة '+response.status+' — '+body.slice(0,180));}
-    apiSpec=await response.json();
-    const paths=apiSpec.paths||{};
-    apiTables=Object.keys(paths).filter(k=>k.startsWith('/')&&!k.includes('{')&&k!=='/').map(k=>({name:k.slice(1),path:paths[k]}));
-    if(!apiTables.length) throw new Error('تم الاتصال لكن لم تظهر جداول متاحة من واجهة REST. راجع إعدادات Data API.');
-    const candidates=apiTables.map(t=>({...t,score:scoreCustomerTable(t.name)})).sort((a,b)=>b.score-a.score);
-    customerTable=candidates[0]?.score>0?candidates[0]:null;
-    const details=apiTables.map(t=>{
-      const schema=apiSpec.definitions?.[t.name]||apiSpec.definitions?.[t.name.replace(/[^a-zA-Z0-9_]/g,'_')]||{};
-      const cols=Object.keys(schema.properties||{});
-      return '<div><b>'+esc(t.name)+'</b>'+(cols.length?': '+cols.map(esc).join(', '):'')+'</div>';
-    }).join('');
-    document.getElementById('schemaDetails').innerHTML=details||'تم الاتصال، لكن مخطط الأعمدة غير ظاهر.';
-    if(customerTable){
-      const def=apiSpec.definitions?.[customerTable.name]||{};
-      customerColumns=Object.keys(def.properties||{});
-      if(!customerColumns.length){const postRef=customerTable.path?.post?.parameters?.find(p=>p.in==='body')?.schema?.$ref; if(postRef)customerColumns=Object.keys(apiSpec.definitions?.[postRef.split('/').pop()]?.properties||{});}
-      apiReady=true;
-      setConnection(true,'تم الاتصال واكتشاف '+apiTables.length+' جدولًا. جدول العملاء المرشح: '+customerTable.name+'. جرّب حفظ عميل تجريبي غير حقيقي أولًا.');
-      await loadCustomers();
-    }else{
-      setConnection(true,'تم الاتصال واكتشاف '+apiTables.length+' جدولًا، لكن لم أستطع تحديد جدول العملاء تلقائيًا. راجع تفاصيل الجداول بالأسفل.');
+    const res=await fetch(SUPABASE_URL+'/rest/v1/'+CUSTOMER_TABLE+'?select=*&limit=1',{headers:apiHeaders});
+    if(!res.ok){const body=await res.text();
+      if(res.status===401||res.status===403) throw new Error('رفضت صلاحيات قراءة جدول store_customers ('+res.status+'). لا تستخدم مفتاحًا سريًا؛ نحتاج ضبط سياسات RLS/صلاحيات Data API. '+body.slice(0,180));
+      if(res.status===404||res.status===406) throw new Error('لم يتم العثور على جدول store_customers أو أنه غير مكشوف عبر Data API ('+res.status+'). نحتاج الاسم الفعلي للجدول. '+body.slice(0,180));
+      throw new Error('استجابة '+res.status+': '+body.slice(0,200));
     }
-  }catch(err){setConnection(false,'لم يكتمل الاتصال: '+err.message+' — لم يتم تعديل أي بيانات.');document.getElementById('schemaDetails').textContent='تعذر جلب مخطط الجداول. تأكد من أن Data API مفعّل وأن المفتاح العام صحيح.';}
+    const rows=await res.json();
+    if(rows.length){
+      const cols=Object.keys(rows[0]);
+      const pick=patterns=>cols.find(c=>patterns.some(p=>p.test(c)));
+      const nameCol=pick([/^name$/i,/customer_name/i,/shop_name/i,/full_name/i,/client_name/i]);
+      const phoneCol=pick([/^phone$/i,/phone_number/i,/mobile/i,/telephone/i]);
+      const addressCol=pick([/^address$/i,/street_address/i,/location/i]);
+      if(nameCol) customerTable.mapping={nameCol,phoneCol,addressCol};
+      document.getElementById('schemaDetails').textContent='الجدول الذي تم الوصول إليه: '+CUSTOMER_TABLE+'؛ الأعمدة التي ظهرت: '+cols.join(', ');
+    } else {
+      document.getElementById('schemaDetails').textContent='تم الوصول إلى store_customers وقراءة الجدول دون أخطاء، لكنه لا يحتوي صفوفًا ظاهرة للمفتاح الحالي. سيتم استخدام الأعمدة الشائعة name و phone و address عند اختبار الإضافة.';
+    }
+    apiReady=true;
+    setConnection(true,'نجح الوصول إلى جدول store_customers باستخدام المفتاح العام. لم يتم تعديل أي بيانات. جرّب إضافة عميل تجريبي فقط لاختبار صلاحية الحفظ.');
+    await loadCustomers();
+  }catch(err){setConnection(false,'لم يكتمل الاتصال: '+err.message+' — لم يتم تعديل أي بيانات.');document.getElementById('schemaDetails').textContent='فشل الاختبار المباشر لجدول store_customers. لن نطلب مفتاحًا سريًا داخل المتصفح.';}
 }
 function chooseColumn(cols,patterns){return cols.find(c=>patterns.some(p=>p.test(c)));}
-function tableColumnInfo(){const def=apiSpec?.definitions?.[customerTable?.name]||{};let props=def.properties||{};if(!Object.keys(props).length){const ref=customerTable?.path?.post?.parameters?.find(p=>p.in==='body')?.schema?.$ref;if(ref)props=apiSpec.definitions?.[ref.split('/').pop()]?.properties||{};}return props;}
 async function loadCustomers(){
   if(!customerTable)return;
   try{
-    const cols=Object.keys(tableColumnInfo());
-    const nameCol=chooseColumn(cols,[/^name$/i,/customer_name/i,/shop_name/i,/full_name/i,/client_name/i]);
-    const phoneCol=chooseColumn(cols,[/^phone$/i,/phone_number/i,/mobile/i,/telephone/i]);
-    const addressCol=chooseColumn(cols,[/^address$/i,/street_address/i,/location/i]);
-    if(!nameCol){setConnection(true,'تم الاتصال، لكن اسم عمود العميل غير معروف؛ لن نحاول الحفظ لتجنب إدخال بيانات في عمود خاطئ.');return;}
-    customerTable.mapping={nameCol,phoneCol,addressCol};
-    const selectCols=[...new Set([nameCol,phoneCol,addressCol].filter(Boolean))].join(',');
-    const res=await fetch(SUPABASE_URL+'/rest/v1/'+encodeURIComponent(customerTable.name)+'?select='+encodeURIComponent(selectCols)+'&order='+encodeURIComponent(nameCol)+'.asc&limit=100',{headers:apiHeaders});
-    if(!res.ok){const body=await res.text();throw new Error('قراءة العملاء: '+res.status+' '+body.slice(0,160));}
+    const res=await fetch(SUPABASE_URL+'/rest/v1/'+CUSTOMER_TABLE+'?select=*&limit=100',{headers:apiHeaders});
+    if(!res.ok){const body=await res.text();throw new Error('قراءة العملاء: '+res.status+' '+body.slice(0,180));}
     const rows=await res.json();
-    customers.splice(0,customers.length,...rows.map(r=>({name:r[nameCol]||'',phone:phoneCol?r[phoneCol]||'':'',address:addressCol?r[addressCol]||'':''})).filter(r=>r.name));
-    render();
-  }catch(err){setConnection(true,'الاتصال موجود، لكن قراءة العملاء لم تنجح بسبب صلاحيات الجدول أو مخططه: '+err.message);}
+    if(rows.length){
+      const cols=Object.keys(rows[0]);
+      const nameCol=chooseColumn(cols,[/^name$/i,/customer_name/i,/shop_name/i,/full_name/i,/client_name/i]);
+      const phoneCol=chooseColumn(cols,[/^phone$/i,/phone_number/i,/mobile/i,/telephone/i]);
+      const addressCol=chooseColumn(cols,[/^address$/i,/street_address/i,/location/i]);
+      if(!nameCol){setConnection(true,'تم الوصول إلى الجدول، لكن لم أتعرف على عمود اسم العميل؛ لم نحاول الحفظ.');return;}
+      customerTable.mapping={nameCol,phoneCol,addressCol};
+      customers.splice(0,customers.length,...rows.map(r=>({name:r[nameCol]||'',phone:phoneCol?r[phoneCol]||'':'',address:addressCol?r[addressCol]||'':''})).filter(r=>r.name));
+      document.getElementById('schemaDetails').textContent='الجدول: '+CUSTOMER_TABLE+'؛ الأعمدة: '+cols.join(', ');
+      render();
+    }else{customers.splice(0,customers.length);render();}
+  }catch(err){setConnection(true,'تم الوصول المبدئي، لكن قراءة العملاء لم تنجح: '+err.message);}
 }
 document.getElementById('testConnectionBtn').addEventListener('click',discoverSupabase);
 document.getElementById('customerForm').addEventListener('submit',async e=>{
  e.preventDefault();
  const name=customerName.value.trim(),phone=customerPhone.value.trim(),address=customerAddress.value.trim();
- if(!apiReady||!customerTable||!customerTable.mapping){alert('لم يكتمل ربط جدول العملاء بعد. راجع حالة الاتصال أعلى الصفحة.');return;}
- const m=customerTable.mapping, payload={[m.nameCol]:name};if(m.phoneCol&&phone)payload[m.phoneCol]=phone;if(m.addressCol&&address)payload[m.addressCol]=address;
+ if(!apiReady||!customerTable){alert('اختبار الاتصال بجدول العملاء لم ينجح. راجع حالة الاتصال أعلى الصفحة.');return;}
+ const m=customerTable.mapping||{nameCol:'name',phoneCol:'phone',addressCol:'address'};
+ if(!m.nameCol){alert('لم يتم تحديد عمود اسم العميل؛ لم يتم الحفظ.');return;}
+ const payload={[m.nameCol]:name};if(m.phoneCol&&phone)payload[m.phoneCol]=phone;if(m.addressCol&&address)payload[m.addressCol]=address;
  try{
-  const res=await fetch(SUPABASE_URL+'/rest/v1/'+encodeURIComponent(customerTable.name),{method:'POST',headers:{...apiHeaders,'Prefer':'return=representation'},body:JSON.stringify(payload)});
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+CUSTOMER_TABLE,{method:'POST',headers:{...apiHeaders,'Prefer':'return=representation'},body:JSON.stringify(payload)});
   if(!res.ok){const body=await res.text();throw new Error('رفضت قاعدة البيانات الحفظ ('+res.status+'): '+body.slice(0,260));}
-  e.target.reset();hideForm('customerForm');await loadCustomers();alert('تم إرسال العميل إلى قاعدة البيانات بنجاح. تأكد من ظهوره في القائمة.');
- }catch(err){alert('لم يتم حفظ العميل. '+err.message+'\nلم تُحفظ البيانات في الواجهة فقط. أرسل صورة رسالة الخطأ لنضبط الأعمدة أو الصلاحيات.');}
+  e.target.reset();hideForm('customerForm');await loadCustomers();alert('تم قبول طلب الحفظ من Supabase. تأكد من ظهور العميل في القائمة.');
+ }catch(err){alert('لم يتم حفظ العميل. '+err.message+'\nلم تُحفظ البيانات في الواجهة فقط. لا تستخدم مفتاحًا سريًا في المتصفح.');}
 });
 document.getElementById('productForm').addEventListener('submit',e=>{e.preventDefault();products.push({name:productName.value.trim(),price:Number(productPrice.value),qty:Number(productQty.value)});e.target.reset();hideForm('productForm');render()});
 document.getElementById('invoiceForm').addEventListener('submit',e=>{e.preventDefault();const amount=Number(invoiceAmount.value),paid=Number(invoicePaid.value);if(paid>amount){alert('المبلغ المدفوع لا يمكن أن يكون أكبر من قيمة الفاتورة');return}invoices.push({customer:invoiceCustomer.value,amount,paid});e.target.reset();hideForm('invoiceForm');render()});
