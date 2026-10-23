@@ -167,7 +167,7 @@ document.getElementById('customerForm').addEventListener('submit',async e=>{
  if(!m.nameCol){alert('لم يتم تحديد عمود اسم العميل؛ لم يتم الحفظ.');return;}
  const payload={[m.nameCol]:name};if(m.phoneCol&&phone)payload[m.phoneCol]=phone;if(m.addressCol&&address)payload[m.addressCol]=address;
  try{
-  const res=await fetch(SUPABASE_URL+'/rest/v1/'+CUSTOMER_TABLE,{method:'POST',headers:{...apiHeaders,'Prefer':'return=representation'},body:JSON.stringify(payload)});
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+CUSTOMER_TABLE,{method:'POST',headers:{...apiHeaders,'Prefer':'return=minimal'},body:JSON.stringify(payload)});
   if(!res.ok){const body=await res.text();throw new Error('رفضت قاعدة البيانات الحفظ ('+res.status+'): '+body.slice(0,260));}
   e.target.reset();hideForm('customerForm');await loadCustomers();alert('تم قبول طلب الحفظ من Supabase. تأكد من ظهور العميل في القائمة.');
  }catch(err){alert('لم يتم حفظ العميل. '+err.message+'\nلم تُحفظ البيانات في الواجهة فقط. لا تستخدم مفتاحًا سريًا في المتصفح.');}
